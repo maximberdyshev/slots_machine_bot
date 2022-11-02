@@ -1,0 +1,28 @@
+{
+  "name": "slots_machine_bot",
+  "version": "1.0.0",
+  "description": "no desc",
+  "main": "smb.js",
+  "type": "module",
+  "scripts": {
+    "test": "nodemon src/smb.js",
+    "start": "node src/smb.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximberdyshev/slots_machine_bot.git"
+  },
+  "author": "mnb",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/maximberdyshev/slots_machine_bot/issues"
+  },
+  "homepage": "https://github.com/maximberdyshev/slots_machine_bot#readme",
+  "devDependencies": {
+    "nodemon": "2.0.20"
+  },
+  "dependencies": {
+    "dotenv": "16.0.3",
+    "telegraf": "4.10.0"
+  }
+}
