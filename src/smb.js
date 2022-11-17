@@ -11,10 +11,10 @@ smb.on('dice', (ctx) => {
   if (ctx.chat.id != process.env.CHAT_ID) return
 
   // античит :D
-//   if (ctx.message.forward_date) {
-//     ctx.reply('Читы - бан!')
-//     return
-//   }
+  if (ctx.message.forward_date) {
+    ctx.reply('Читы - бан!')
+    return
+  }
 
   let user = {
     user_id: null,
