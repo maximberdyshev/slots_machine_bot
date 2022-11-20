@@ -8,9 +8,12 @@ const smb = new Telegraf(process.env.BOT_TOKEN)
 
 smb.on('dice', async (ctx) => {
   // ограничение на доступ
+  // TODO: сделать проверку через таблицу в БД
   if (ctx.chat.id != process.env.CHAT_ID) return
 
   // античит :D
+  // (не работает против юзербота!)
+  // TODO: возможно ограничить? )
   if (ctx.message.forward_date) {
     ctx.reply('Читы - бан!')
     return
@@ -43,9 +46,9 @@ smb.on('dice', async (ctx) => {
       last_name: ctx.message.from.last_name,
       nickname: ctx.message.from.username,
     }
+    await DBC.setUser(newUser)
 
     // и внести бросок в БД
-    await DBC.setUser(newUser)
     await DBC.setThrow(diceThrow)
     return
   }
@@ -53,6 +56,7 @@ smb.on('dice', async (ctx) => {
 
 smb.command('/my_dices', async (ctx) => {
   // ограничение на доступ
+  // TODO: сделать проверку через таблицу в БД 
   if (ctx.chat.id != process.env.CHAT_ID) return
 
   let response = {
@@ -83,7 +87,7 @@ smb.command('/my_dices', async (ctx) => {
     response.dice_lemons = await DBC.getMyDices(ctx.message.from.id, 'lemons')
     response.dice_axes = await DBC.getMyDices(ctx.message.from.id, 'axes')
     
-    response.networth = (response.dice_alko * 100) + (response.dice_berries * 100) + (response.dice_lemons * 100) + (response.dice_axes * 1000) - (response.dice_counts * 10)
+    response.networth = await DBC.getMyNetWorth(ctx.message.from.id)
     response.user_balance = 1000 + (response.dice_alko * 100) + (response.dice_berries * 100) + (response.dice_lemons * 100) + (response.dice_axes * 1000) - (response.dice_counts * 10)
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
