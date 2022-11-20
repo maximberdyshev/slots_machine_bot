@@ -26,7 +26,7 @@ const knexfile = {
 
   // staging: {},
 
-  production: {},
+  // production: {},
 }
 
 export default knexfile
