@@ -92,7 +92,7 @@ smb.command('/my_dices', async (ctx) => {
     response.dice_axes = await DBC.getMyDices(ctx.message.from.id, 'axes')
 
     response.networth = await DBC.getMyNetWorth(ctx.message.from.id)
-    response.user_balance = 1000 + response.networth
+    response.user_balance = Number.parseInt(1000 + response.networth)
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
     chance.berries = (
