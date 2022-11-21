@@ -65,7 +65,7 @@ smb.command('/my_dices', async (ctx) => {
 
   let response = {
     user_name: ctx.message.from.first_name,
-    user_balance: 1000,
+    // user_balance: 1000,
     dice_counts: 0,
     dice_alko: 0,
     dice_berries: 0,
@@ -92,7 +92,7 @@ smb.command('/my_dices', async (ctx) => {
     response.dice_axes = await DBC.getMyDices(ctx.message.from.id, 'axes')
 
     response.networth = await DBC.getMyNetWorth(ctx.message.from.id)
-    response.user_balance = Number.parseInt(1000 + response.networth)
+    // response.user_balance = Number.parseInt(1000 + response.networth)
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
     chance.berries = (
@@ -111,7 +111,6 @@ smb.command('/my_dices', async (ctx) => {
     ягодки:  ${response.dice_berries},  (${chance.berries}%)
     лимоны:  ${response.dice_lemons},  (${chance.lemons}%)
     топоры:  ${response.dice_axes},  (${chance.axes}%)
-    баланc:  ${response.user_balance}
     net worth:  ${response.networth}`)
 
     return
