@@ -70,7 +70,7 @@ const DBC = {
       if (res.length == 0) {
         return false
       } else {
-        return res[0].id
+        return true
       }
     } else {
       return false
@@ -93,7 +93,7 @@ const DBC = {
       if (res.length == 0) {
         return false
       } else {
-        return res[0].id
+        return true
       }
     } else {
       return false
