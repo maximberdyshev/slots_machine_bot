@@ -7,6 +7,28 @@ dotenv.config({ path: '~/Prog/lm/.env' })
 const knx = knex(knexfile[process.env.KNEX_PROFILE])
 
 const DBC = {
+  getAllBalance: async () => {
+    const res = await knx('net_worth')
+      .select(['first_name','net_worth'])
+      .then((net_worth) => {
+        return net_worth
+      })
+      .catch((err) => {
+        console.log(`DBC.getAllBalance(), err: ${err}`)
+        return false
+      })
+
+    if (res) {
+      if (res.length == 0) {
+        return 0
+      } else {
+        return res
+      }
+    } else {
+      return 0
+    }
+  },
+
   getMyNetWorth: async (req) => {
     const res = await knx('net_worth')
       .select('net_worth')

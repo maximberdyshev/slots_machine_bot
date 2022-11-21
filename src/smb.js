@@ -91,8 +91,14 @@ smb.command('/my_dices', async (ctx) => {
     response.user_balance = 1000 + Number.parseInt(response.networth)
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
-    chance.berries = ((response.dice_berries * 100) / response.dice_counts).toFixed(2)
-    chance.lemons = ((response.dice_lemons * 100) / response.dice_counts).toFixed(2)
+    chance.berries = (
+      (response.dice_berries * 100) /
+      response.dice_counts
+    ).toFixed(2)
+    chance.lemons = (
+      (response.dice_lemons * 100) /
+      response.dice_counts
+    ).toFixed(2)
     chance.axes = ((response.dice_axes * 100) / response.dice_counts).toFixed(2)
 
     ctx.sendMessage(`${response.user_name}, твоя стата:
@@ -113,15 +119,26 @@ smb.command('/my_dices', async (ctx) => {
 })
 
 smb.command('all_stats', async (ctx) => {
-    // ограничение на доступ
-    const checkAccess = await DBC.getAcces(ctx.chat.id)
-    if (!checkAccess) return
+  // ограничение на доступ
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
+  const allBalance = await DBC.getAllBalance()
+
+  let userStats = []
+
+  for (let balance of allBalance) {
+    let user = `${balance.first_name}:   ${1000 + Number.parseInt(balance.net_worth)}`
+    userStats.push(user)
+  }
+
+  ctx.sendMessage(userStats.toString().replaceAll(',', '\n'))
 })
 
 smb.command('mvp', async (ctx) => {
-    // ограничение на доступ
-    const checkAccess = await DBC.getAcces(ctx.chat.id)
-    if (!checkAccess) return
+  // ограничение на доступ
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
 })
 
 smb.launch()
