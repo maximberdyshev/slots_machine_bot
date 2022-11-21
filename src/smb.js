@@ -8,8 +8,6 @@ const smb = new Telegraf(process.env.BOT_TOKEN)
 
 smb.on('dice', async (ctx) => {
   // ограничение на доступ
-  // TODO: сделать проверку через таблицу в БД
-  //   if (ctx.chat.id != process.env.CHAT_ID) return
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
 
@@ -58,14 +56,12 @@ smb.on('dice', async (ctx) => {
 
 smb.command('/my_dices', async (ctx) => {
   // ограничение на доступ
-  // TODO: сделать проверку через таблицу в БД
-  //   if (ctx.chat.id != process.env.CHAT_ID) return
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
 
   let response = {
     user_name: ctx.message.from.first_name,
-    // user_balance: 1000,
+    user_balance: 1000,
     dice_counts: 0,
     dice_alko: 0,
     dice_berries: 0,
@@ -92,17 +88,11 @@ smb.command('/my_dices', async (ctx) => {
     response.dice_axes = await DBC.getMyDices(ctx.message.from.id, 'axes')
 
     response.networth = await DBC.getMyNetWorth(ctx.message.from.id)
-    // response.user_balance = Number.parseInt(1000 + response.networth)
+    response.user_balance = 1000 + Number.parseInt(response.networth)
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
-    chance.berries = (
-      (response.dice_berries * 100) /
-      response.dice_counts
-    ).toFixed(2)
-    chance.lemons = (
-      (response.dice_lemons * 100) /
-      response.dice_counts
-    ).toFixed(2)
+    chance.berries = ((response.dice_berries * 100) / response.dice_counts).toFixed(2)
+    chance.lemons = ((response.dice_lemons * 100) / response.dice_counts).toFixed(2)
     chance.axes = ((response.dice_axes * 100) / response.dice_counts).toFixed(2)
 
     ctx.sendMessage(`${response.user_name}, твоя стата:
@@ -111,6 +101,7 @@ smb.command('/my_dices', async (ctx) => {
     ягодки:  ${response.dice_berries},  (${chance.berries}%)
     лимоны:  ${response.dice_lemons},  (${chance.lemons}%)
     топоры:  ${response.dice_axes},  (${chance.axes}%)
+    баланс: ${response.user_balance}
     net worth:  ${response.networth}`)
 
     return
@@ -119,6 +110,18 @@ smb.command('/my_dices', async (ctx) => {
   // если пользователь новый, то выводим сообщение
   ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
 Ждёшь особого приглашения? Крути слоты!!!`)
+})
+
+smb.command('all_stats', async (ctx) => {
+    // ограничение на доступ
+    const checkAccess = await DBC.getAcces(ctx.chat.id)
+    if (!checkAccess) return
+})
+
+smb.command('mvp', async (ctx) => {
+    // ограничение на доступ
+    const checkAccess = await DBC.getAcces(ctx.chat.id)
+    if (!checkAccess) return
 })
 
 smb.launch()
