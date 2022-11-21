@@ -9,7 +9,9 @@ const smb = new Telegraf(process.env.BOT_TOKEN)
 smb.on('dice', async (ctx) => {
   // ограничение на доступ
   // TODO: сделать проверку через таблицу в БД
-  if (ctx.chat.id != process.env.CHAT_ID) return
+  //   if (ctx.chat.id != process.env.CHAT_ID) return
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
 
   // античит :D
   // (не работает против юзербота!)
@@ -56,8 +58,10 @@ smb.on('dice', async (ctx) => {
 
 smb.command('/my_dices', async (ctx) => {
   // ограничение на доступ
-  // TODO: сделать проверку через таблицу в БД 
-  if (ctx.chat.id != process.env.CHAT_ID) return
+  // TODO: сделать проверку через таблицу в БД
+  //   if (ctx.chat.id != process.env.CHAT_ID) return
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -86,13 +90,19 @@ smb.command('/my_dices', async (ctx) => {
     response.dice_berries = await DBC.getMyDices(ctx.message.from.id, 'berries')
     response.dice_lemons = await DBC.getMyDices(ctx.message.from.id, 'lemons')
     response.dice_axes = await DBC.getMyDices(ctx.message.from.id, 'axes')
-    
+
     response.networth = await DBC.getMyNetWorth(ctx.message.from.id)
-    response.user_balance = 1000 + (response.dice_alko * 100) + (response.dice_berries * 100) + (response.dice_lemons * 100) + (response.dice_axes * 1000) - (response.dice_counts * 10)
+    response.user_balance = 1000 + response.networth
 
     chance.alko = ((response.dice_alko * 100) / response.dice_counts).toFixed(2)
-    chance.berries = ((response.dice_berries * 100) / response.dice_counts).toFixed(2)
-    chance.lemons = ((response.dice_lemons * 100) / response.dice_counts).toFixed(2)
+    chance.berries = (
+      (response.dice_berries * 100) /
+      response.dice_counts
+    ).toFixed(2)
+    chance.lemons = (
+      (response.dice_lemons * 100) /
+      response.dice_counts
+    ).toFixed(2)
     chance.axes = ((response.dice_axes * 100) / response.dice_counts).toFixed(2)
 
     ctx.sendMessage(`${response.user_name}, твоя стата:

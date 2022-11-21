@@ -77,6 +77,29 @@ const DBC = {
     }
   },
 
+  getAcces: async (req) => {
+    const res = await knx('chats')
+      .select('is_allowed')
+      .where({ id: req })
+      .then((is_allowed) => {
+        return is_allowed
+      })
+      .catch((err) => {
+        console.log(`DBC.getAcces(), err: ${err}`)
+        return false
+      })
+
+    if (res) {
+      if (res.length == 0) {
+        return false
+      } else {
+        return res[0].id
+      }
+    } else {
+      return false
+    }
+  },
+
   setUser: async (req) => {
     await knx('users')
       .insert({
