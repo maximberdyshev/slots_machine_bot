@@ -7,9 +7,31 @@ dotenv.config({ path: '~/Prog/lm/.env' })
 const knx = knex(knexfile[process.env.KNEX_PROFILE])
 
 const DBC = {
+  getMVP: async () => {
+    const res = await knx('mvp_day')
+      .select(['first_name', 'net_worth'])
+      .then((net_worth) => {
+        return net_worth
+      })
+      .catch((err) => {
+        console.log(`DBC.getMVP(), err: ${err}`)
+        return false
+      })
+
+    if (res) {
+      if (res.length == 0) {
+        return 0
+      } else {
+        return res
+      }
+    } else {
+      return 0
+    }
+  },
+
   getAllBalance: async () => {
     const res = await knx('net_worth')
-      .select(['first_name','net_worth'])
+      .select(['first_name', 'net_worth'])
       .then((net_worth) => {
         return net_worth
       })

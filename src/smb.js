@@ -54,7 +54,7 @@ smb.on('dice', async (ctx) => {
   }
 })
 
-smb.command('/my_dices', async (ctx) => {
+smb.command('my_dices', async (ctx) => {
   // ограничение на доступ
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
@@ -139,6 +139,11 @@ smb.command('mvp', async (ctx) => {
   // ограничение на доступ
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
+
+  const mvp = await DBC.getMVP()
+  ctx.sendMessage(`MVP дня:
+Игрок ${mvp[0].first_name}!!! Со ценностью в ${mvp[0].net_worth} очков!!
+Что за лев этот тигр!!`)
 })
 
 smb.launch()
