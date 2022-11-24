@@ -61,30 +61,30 @@ smb.on('dice', async (ctx) => {
 
       // реплики бота на триплы
       // TODO: повесить рандомайзер
-      if (ctx.message.dice.value == 64) {
-        ctx.sendSticker(
-          'CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ',
-          ctx.message.from.id
-        )
-      }
-      if (ctx.message.dice.value == 1) {
-        ctx.sendSticker(
-          'CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ',
-          ctx.message.from.id
-        )
-      }
-      if (ctx.message.dice.value == 22) {
-        ctx.sendSticker(
-          'CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ',
-          ctx.message.from.id
-        )
-      }
-      if (ctx.message.dice.value == 43) {
-        ctx.sendSticker(
-          'CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ',
-          ctx.message.from.id
-        )
-      }
+      // if (ctx.message.dice.value == 64) {
+      //   ctx.sendSticker(
+      //     'CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ',
+      //     ctx.message.from.id
+      //   )
+      // }
+      // if (ctx.message.dice.value == 1) {
+      //   ctx.sendSticker(
+      //     'CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ',
+      //     ctx.message.from.id
+      //   )
+      // }
+      // if (ctx.message.dice.value == 22) {
+      //   ctx.sendSticker(
+      //     'CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ',
+      //     ctx.message.from.id
+      //   )
+      // }
+      // if (ctx.message.dice.value == 43) {
+      //   ctx.sendSticker(
+      //     'CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ',
+      //     ctx.message.from.id
+      //   )
+      // }
 
       // ctx.sendSticker('CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ','306979269') база
       // CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ ахуителен
