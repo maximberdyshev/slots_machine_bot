@@ -6,12 +6,12 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
-let usersAknowledge = []
+// let usersAknowledge = []
 let slotLimit = []
 
-const clear = () => {
-  usersAknowledge.shift()
-}
+// const clear = () => {
+//   usersAknowledge.shift()
+// }
 
 smb.on('dice', async (ctx) => {
   // ограничение на доступ
@@ -71,6 +71,13 @@ smb.on('dice', async (ctx) => {
       )
       oneSlot.message_id = sendID.message_id
       oneSlot.date = new Date().getTime()
+      if (slotLimit.length >= 15) {
+        ctx.deleteMessage(slotLimit[0].message_id)
+        slotLimit.shift()
+        slotLimit.push(oneSlot)
+      } else {
+        slotLimit.push(oneSlot)
+      }
     }
     if (ctx.message.dice.value == 1) {
       sendID = await ctx.sendSticker(
@@ -79,6 +86,13 @@ smb.on('dice', async (ctx) => {
       )
       oneSlot.message_id = sendID.message_id
       oneSlot.date = new Date().getTime()
+      if (slotLimit.length >= 15) {
+        ctx.deleteMessage(slotLimit[0].message_id)
+        slotLimit.shift()
+        slotLimit.push(oneSlot)
+      } else {
+        slotLimit.push(oneSlot)
+      }
     }
     if (ctx.message.dice.value == 22) {
       sendID = await ctx.sendSticker(
@@ -87,6 +101,13 @@ smb.on('dice', async (ctx) => {
       )
       oneSlot.message_id = sendID.message_id
       oneSlot.date = new Date().getTime()
+      if (slotLimit.length >= 15) {
+        ctx.deleteMessage(slotLimit[0].message_id)
+        slotLimit.shift()
+        slotLimit.push(oneSlot)
+      } else {
+        slotLimit.push(oneSlot)
+      }
     }
     if (ctx.message.dice.value == 43) {
       sendID = await ctx.sendSticker(
@@ -95,6 +116,13 @@ smb.on('dice', async (ctx) => {
       )
       oneSlot.message_id = sendID.message_id
       oneSlot.date = new Date().getTime()
+      if (slotLimit.length >= 15) {
+        ctx.deleteMessage(slotLimit[0].message_id)
+        slotLimit.shift()
+        slotLimit.push(oneSlot)
+      } else {
+        slotLimit.push(oneSlot)
+      }
     }
 
     // ctx.sendSticker('CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ','306979269') база
