@@ -6,120 +6,69 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
 let user_stat = []
-let usersAknowledge = []
-let usersBanned = []
-let usersBannedID = []
-let admins = []
-
-const clear = () => {
-  usersAknowledge.shift()
-}
-
 smb.on('dice', async (ctx) => {
-  try {
-    if (ctx.chat.id != process.env.CHAT_ID) return
+  if (ctx.chat.id != process.env.CHAT_ID) return
 
-    // usersBanned.push(ctx.message.from.id)
-    // console.log(usersBanned.indexOf(ctx.message.from.id))
+  // античит :D
+  if (ctx.message.forward_date) {
+    ctx.reply('Читы - бан!')
+    return
+  }
 
-    admins = await ctx.getChatAdministrators()
-    // console.log(admins[0].user.id)
+  let user = {
+    user_id: null,
+    user_balance: 1000,
+    dice_counts: 0,
+    dice_alko: 0,
+    dice_berries: 0,
+    dice_lemons: 0,
+    dice_axes: 0,
+  }
 
-    if (usersAknowledge.includes(ctx.message.from.id)) {
-      ctx.deleteMessage(ctx.message.message_id)
-      let isAdmin = false
-      for (let admin of admins) {
-        if (admin.user.id == ctx.message.from.id) {
-          isAdmin = true
-          return
-        }
-      }
-      if (isAdmin) {
+  const counter = (u) => {
+    u.dice_counts += 1
+    u.user_balance -= 10
+    switch (ctx.message.dice.value) {
+      case 1:
+        u.dice_alko += 1
+        u.user_balance += 100
         return
-      } else {
-        ctx.restrictChatMember(ctx.message.from.id, {
-          can_send_messages: false,
-          can_send_media_messages: false,
-          can_send_other_messages: false,
-        })
-        const id = ctx.message.from.id
-        const unban = (id) => {
-          ctx.restrictChatMember(id, {
-            can_send_messages: true,
-            can_send_media_messages: true,
-            can_send_other_messages: true,
-          })
-        }
-        setTimeout(unban(id), 21000)
-      }
-    } else {
-      usersAknowledge.push(ctx.message.from.id)
-      setTimeout(clear, 3000)
-
-      // античит :D
-      if (ctx.message.forward_date) {
-        ctx.reply('Читы - бан!')
+      case 22:
+        u.dice_berries += 1
+        u.user_balance += 100
         return
-      }
-
-      let user = {
-        user_id: null,
-        user_balance: 1000,
-        dice_counts: 0,
-        dice_alko: 0,
-        dice_berries: 0,
-        dice_lemons: 0,
-        dice_axes: 0,
-      }
-
-      const counter = (u) => {
-        u.dice_counts += 1
-        u.user_balance -= 10
-        switch (ctx.message.dice.value) {
-          case 1:
-            u.dice_alko += 1
-            u.user_balance += 100
-            return
-          case 22:
-            u.dice_berries += 1
-            u.user_balance += 100
-            return
-          case 43:
-            u.dice_lemons += 1
-            u.user_balance += 100
-            return
-          case 64:
-            u.dice_axes += 1
-            u.user_balance += 1000
-            return
-        }
-      }
-
-      // первый запуск, статы нет
-      if (user_stat.length == 0) {
-        user.user_id = ctx.message.from.id
-        counter(user)
-        user_stat.push(user)
+      case 43:
+        u.dice_lemons += 1
+        u.user_balance += 100
         return
-      }
+      case 64:
+        u.dice_axes += 1
+        u.user_balance += 1000
+        return
+    }
+  }
 
-      // поиск пользователя по "бд"
-      for (let stat of user_stat) {
-        if (stat.user_id == ctx.message.from.id) {
-          counter(stat)
-          return
-        }
-      }
+  // первый запуск, статы нет
+  if (user_stat.length == 0) {
+    user.user_id = ctx.message.from.id
+    counter(user)
+    user_stat.push(user)
+    return
+  }
 
-      // пользователя нет в "бд"
-      user.user_id = ctx.message.from.id
-      counter(user)
-      user_stat.push(user)
+  // поиск пользователя по "бд"
+  for (let stat of user_stat) {
+    if (stat.user_id == ctx.message.from.id) {
+      counter(stat)
       return
     }
-  } catch (err) {
-    console.log(`smb.on(), err: ${err}`)
   }
+
+  // пользователя нет в "бд"
+  user.user_id = ctx.message.from.id
+  counter(user)
+  user_stat.push(user)
+  return
 })
 
 smb.command('/my_dices', (ctx) => {
