@@ -6,86 +6,113 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
+let usersAknowledge = []
+let slotLimit = []
+
+const clear = () => {
+  usersAknowledge.shift()
+}
+
 smb.on('dice', async (ctx) => {
   // ограничение на доступ
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
 
-  // античит :D
-  // (не работает против юзербота!)
-  // TODO: возможно ограничить? )
-  if (ctx.message.forward_date) {
-    ctx.reply('Читы - бан!')
-    return
-  }
-
-  if (ctx.message.dice.emoji != '🎰') {
-    return
+  // ограничитель на кол-во дайсов
+  if (usersAknowledge.includes(ctx.message.from.id)) {
+    ctx.deleteMessage(ctx.message.message_id)
   } else {
-    // проверяем наличие пользователя в БД
-    const checkUser = await DBC.getUser(ctx.message.from.id)
+    usersAknowledge.push(ctx.message.from.id)
+    setTimeout(clear, 3000)
 
-    // регистрируем бросок
-    const diceThrow = {
-      date: new Date(),
-      user_id: ctx.message.from.id,
-      dice_id: ctx.message.dice.value,
-      chat_id: ctx.message.chat.id,
+    let oneSlot = {
+      message_id: ctx.message.message_id,
+      date: new Date().getTime(),
     }
-
-    // реплики бота на триплы
-    // TODO: повесить рандомайзер
-    if (ctx.message.dice.value == 64) {
-      ctx.sendSticker(
-        'CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ',
-        ctx.message.from.id
-      )
-    }
-    if (ctx.message.dice.value == 1) {
-      ctx.sendSticker(
-        'CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ',
-        ctx.message.from.id
-      )
-    }
-    if (ctx.message.dice.value == 22) {
-      ctx.sendSticker(
-        'CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ',
-        ctx.message.from.id
-      )
-    }
-    if (ctx.message.dice.value == 43) {
-      ctx.sendSticker(
-        'CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ',
-        ctx.message.from.id
-      )
+    if (slotLimit.length >= 10) {
+      ctx.deleteMessage(slotLimit[0].message_id)
+      slotLimit.shift()
+      slotLimit.push(oneSlot)
+    } else {
+      slotLimit.push(oneSlot)
     }
 
-    // ctx.sendSticker('CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ','306979269') база
-    // CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ ахуителен
-    // CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ харош
-    // CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ ультрамегасупер дуперхарош
-    // CAACAgIAAxkBAAIChmN7Xxf0GAntX_V77wVZHdfLm1hBAAIfDgAC6lD4SG7cXPnbOg7bKwQ мегахарош
+    // античит :D
+    // (не работает против юзербота!)
+    // TODO: возможно ограничить? )
+    if (ctx.message.forward_date) {
+      ctx.reply('Читы - бан!')
+      return
+    }
 
-    // если пользователь есть, то просто внести бросок в БД
-    if (checkUser) {
+    if (ctx.message.dice.emoji != '🎰') {
+      return
+    } else {
+      // проверяем наличие пользователя в БД
+      const checkUser = await DBC.getUser(ctx.message.from.id)
+
+      // регистрируем бросок
+      const diceThrow = {
+        date: new Date(),
+        user_id: ctx.message.from.id,
+        dice_id: ctx.message.dice.value,
+        chat_id: ctx.message.chat.id,
+      }
+
+      // реплики бота на триплы
+      // TODO: повесить рандомайзер
+      if (ctx.message.dice.value == 64) {
+        ctx.sendSticker(
+          'CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ',
+          ctx.message.from.id
+        )
+      }
+      if (ctx.message.dice.value == 1) {
+        ctx.sendSticker(
+          'CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ',
+          ctx.message.from.id
+        )
+      }
+      if (ctx.message.dice.value == 22) {
+        ctx.sendSticker(
+          'CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ',
+          ctx.message.from.id
+        )
+      }
+      if (ctx.message.dice.value == 43) {
+        ctx.sendSticker(
+          'CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ',
+          ctx.message.from.id
+        )
+      }
+
+      // ctx.sendSticker('CAACAgIAAxkBAAICgGN7XTAotgHhdvlyT4pjM5ZeavokAALXGgACAldIScihT69U4hKHKwQ','306979269') база
+      // CAACAgIAAxkBAAICg2N7XrjeZ4rr5HCgahipIY-_ecYCAAJ8EQACTbD4SGTMci63kLrWKwQ ахуителен
+      // CAACAgIAAxkBAAIChGN7Xt_GWDMsDdYhC8I0i_qdSREJAAKiDwACIVD4SF2L5ep3b5-EKwQ харош
+      // CAACAgIAAxkBAAIChWN7Xu8rD0Hjd5C7xCFajMPiCs-cAAJYFAACMET4SPA1u80JntoQKwQ ультрамегасупер дуперхарош
+      // CAACAgIAAxkBAAIChmN7Xxf0GAntX_V77wVZHdfLm1hBAAIfDgAC6lD4SG7cXPnbOg7bKwQ мегахарош
+
+      // если пользователь есть, то просто внести бросок в БД
+      if (checkUser) {
+        await DBC.setThrow(diceThrow)
+        // ctx.deleteMessage(ctx.message.message_id)
+        return
+      }
+
+      // если пользователя нет, то добавить в БД
+      const newUser = {
+        id: ctx.message.from.id,
+        first_name: ctx.message.from.first_name,
+        last_name: ctx.message.from.last_name,
+        nickname: ctx.message.from.username,
+      }
+      await DBC.setUser(newUser)
+
+      // и внести бросок в БД
       await DBC.setThrow(diceThrow)
       // ctx.deleteMessage(ctx.message.message_id)
       return
     }
-
-    // если пользователя нет, то добавить в БД
-    const newUser = {
-      id: ctx.message.from.id,
-      first_name: ctx.message.from.first_name,
-      last_name: ctx.message.from.last_name,
-      nickname: ctx.message.from.username,
-    }
-    await DBC.setUser(newUser)
-
-    // и внести бросок в БД
-    await DBC.setThrow(diceThrow)
-    // ctx.deleteMessage(ctx.message.message_id)
-    return
   }
 })
 

@@ -6,70 +6,120 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
 let user_stat = []
+let usersAknowledge = []
+let usersBanned = []
+let usersBannedID = []
+let admins = []
 
-smb.on('dice', (ctx) => {
-  if (ctx.chat.id != process.env.CHAT_ID) return
+const clear = () => {
+  usersAknowledge.shift()
+}
 
-  // античит :D
-  if (ctx.message.forward_date) {
-    ctx.reply('Читы - бан!')
-    return
-  }
+smb.on('dice', async (ctx) => {
+  try {
+    if (ctx.chat.id != process.env.CHAT_ID) return
 
-  let user = {
-    user_id: null,
-    user_balance: 1000,
-    dice_counts: 0,
-    dice_alko: 0,
-    dice_berries: 0,
-    dice_lemons: 0,
-    dice_axes: 0,
-  }
+    // usersBanned.push(ctx.message.from.id)
+    // console.log(usersBanned.indexOf(ctx.message.from.id))
 
-  const counter = (u) => {
-    u.dice_counts += 1
-    u.user_balance -= 10
-    switch (ctx.message.dice.value) {
-      case 1:
-        u.dice_alko += 1
-        u.user_balance += 100
+    admins = await ctx.getChatAdministrators()
+    // console.log(admins[0].user.id)
+
+    if (usersAknowledge.includes(ctx.message.from.id)) {
+      ctx.deleteMessage(ctx.message.message_id)
+      let isAdmin = false
+      for (let admin of admins) {
+        if (admin.user.id == ctx.message.from.id) {
+          isAdmin = true
+          return
+        }
+      }
+      if (isAdmin) {
         return
-      case 22:
-        u.dice_berries += 1
-        u.user_balance += 100
-        return
-      case 43:
-        u.dice_lemons += 1
-        u.user_balance += 100
-        return
-      case 64:
-        u.dice_axes += 1
-        u.user_balance += 1000
-        return
-    }
-  }
+      } else {
+        ctx.restrictChatMember(ctx.message.from.id, {
+          can_send_messages: false,
+          can_send_media_messages: false,
+          can_send_other_messages: false,
+        })
+        const id = ctx.message.from.id
+        const unban = (id) => {
+          ctx.restrictChatMember(id, {
+            can_send_messages: true,
+            can_send_media_messages: true,
+            can_send_other_messages: true,
+          })
+        }
+        setTimeout(unban(id), 21000)
+      }
+    } else {
+      usersAknowledge.push(ctx.message.from.id)
+      setTimeout(clear, 3000)
 
-  // первый запуск, статы нет
-  if (user_stat.length == 0) {
-    user.user_id = ctx.message.from.id
-    counter(user)
-    user_stat.push(user)
-    return
-  }
+      // античит :D
+      if (ctx.message.forward_date) {
+        ctx.reply('Читы - бан!')
+        return
+      }
 
-  // поиск пользователя по "бд"
-  for (let stat of user_stat) {
-    if (stat.user_id == ctx.message.from.id) {
-      counter(stat)
+      let user = {
+        user_id: null,
+        user_balance: 1000,
+        dice_counts: 0,
+        dice_alko: 0,
+        dice_berries: 0,
+        dice_lemons: 0,
+        dice_axes: 0,
+      }
+
+      const counter = (u) => {
+        u.dice_counts += 1
+        u.user_balance -= 10
+        switch (ctx.message.dice.value) {
+          case 1:
+            u.dice_alko += 1
+            u.user_balance += 100
+            return
+          case 22:
+            u.dice_berries += 1
+            u.user_balance += 100
+            return
+          case 43:
+            u.dice_lemons += 1
+            u.user_balance += 100
+            return
+          case 64:
+            u.dice_axes += 1
+            u.user_balance += 1000
+            return
+        }
+      }
+
+      // первый запуск, статы нет
+      if (user_stat.length == 0) {
+        user.user_id = ctx.message.from.id
+        counter(user)
+        user_stat.push(user)
+        return
+      }
+
+      // поиск пользователя по "бд"
+      for (let stat of user_stat) {
+        if (stat.user_id == ctx.message.from.id) {
+          counter(stat)
+          return
+        }
+      }
+
+      // пользователя нет в "бд"
+      user.user_id = ctx.message.from.id
+      counter(user)
+      user_stat.push(user)
       return
     }
+  } catch (err) {
+    console.log(`smb.on(), err: ${err}`)
   }
-
-  // пользователя нет в "бд"
-  user.user_id = ctx.message.from.id
-  counter(user)
-  user_stat.push(user)
-  return
 })
 
 smb.command('/my_dices', (ctx) => {
@@ -101,8 +151,13 @@ smb.command('/my_dices', (ctx) => {
       response.dice_berries = stat.dice_berries
       response.dice_lemons = stat.dice_lemons
       response.dice_axes = stat.dice_axes
-      
-      response.networth = (stat.dice_alko * 100) + (stat.dice_berries * 100) + (stat.dice_lemons * 100) + (stat.dice_axes * 1000) - (stat.dice_counts * 10)
+
+      response.networth =
+        stat.dice_alko * 100 +
+        stat.dice_berries * 100 +
+        stat.dice_lemons * 100 +
+        stat.dice_axes * 1000 -
+        stat.dice_counts * 10
 
       chance.alko = ((stat.dice_alko * 100) / stat.dice_counts).toFixed(2)
       chance.berries = ((stat.dice_berries * 100) / stat.dice_counts).toFixed(2)
