@@ -1,7 +1,7 @@
 class GameState {
   static diceLimit = []
 
-  set diceLimit(arr) { GameState.diceLimit = arr}
+  set diceLimit(arr) { GameState.diceLimit = arr }
   get diceLimit() { return GameState.diceLimit }
 }
 

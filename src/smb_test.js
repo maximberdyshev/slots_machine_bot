@@ -9,136 +9,82 @@ const smb = new Telegraf(process.env.BOT_TOKEN)
 let user_stat = []
 
 smb.on('dice', async (ctx) => {
-  try {
-    if (ctx.chat.id != process.env.CHAT_ID) return
+  if (ctx.chat.id != process.env.CHAT_ID) return
 
-    // let dice = {
-    //   message_id: ctx.message.message_id,
-    //   user_id: ctx.message.from.id,
-    //   date: new Date().getTime()
-    // }
+  let dice = {
+    message_id: ctx.message.message_id,
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
+  }
 
-    if (GameState.diceLimit.length >= 5) {
-      ctx.deleteMessage(GameState.diceLimit[0].message_id)
-      GameState.diceLimit.shift()
-      GameState.diceLimit.push({
-        message_id: ctx.message.message_id,
-        user_id: ctx.message.from.id,
-        date: new Date().getTime(),
-      })
-      console.log(GameState.diceLimit)
-    } else {
-      GameState.diceLimit.push({
-        message_id: ctx.message.message_id,
-        user_id: ctx.message.from.id,
-        date: new Date().getTime(),
-      })
-      console.log(GameState.diceLimit)
-    }
+  if (GameState.diceLimit.length >= 3) {
+    ctx.deleteMessage(GameState.diceLimit[0].message_id)
+    GameState.diceLimit.shift()
+    GameState.diceLimit.push(dice)
+  } else {
+    GameState.diceLimit.push(dice)
+  }
 
-    // античит :D
-    if (ctx.message.forward_date) {
-      // dice.message_id = ctx.message.message_id
-      // dice.user_id = ctx.message.from.id
-      if (GameState.diceLimit.length >= 5) {
-        ctx.deleteMessage(GameState.diceLimit[0].message_id)
-        GameState.diceLimit.shift()
-        GameState.diceLimit.push({
-          message_id: ctx.message.message_id,
-          user_id: ctx.message.from.id,
-          date: new Date().getTime(),
-        })
-        console.log(GameState.diceLimit)
-      } else {
-        GameState.diceLimit.push({
-          message_id: ctx.message.message_id,
-          user_id: ctx.message.from.id,
-          date: new Date().getTime(),
-        })
-        console.log(GameState.diceLimit)
-      }
-      console.log(GameState.diceLimit)
-      const botMessage = await ctx.reply('Читы - бан!')
-      // dice.message_id = botMessage.message_id
-      // dice.user_id = botMessage.from.id
-      if (GameState.diceLimit.length >= 5) {
-        ctx.deleteMessage(GameState.diceLimit[0].message_id)
-        GameState.diceLimit.shift()
-        GameState.diceLimit.push({
-          message_id: botMessage.message_id,
-          user_id: botMessage.from.id,
-          date: new Date().getTime(),
-        })
-        console.log(GameState.diceLimit)
-      } else {
-        GameState.diceLimit.push({
-          message_id: botMessage.message_id,
-          user_id: botMessage.from.id,
-          date: new Date().getTime(),
-        })
-        console.log(GameState.diceLimit)
-      }
-      console.log(GameState.diceLimit)
-      return
-    }
+  // античит :D
+  if (ctx.message.forward_date) {
+    ctx.reply('Читы - бан!')
+    return
+  }
 
-    let user = {
-      user_id: null,
-      user_balance: 1000,
-      dice_counts: 0,
-      dice_alko: 0,
-      dice_berries: 0,
-      dice_lemons: 0,
-      dice_axes: 0,
-    }
+  let user = {
+    user_id: null,
+    user_balance: 1000,
+    dice_counts: 0,
+    dice_alko: 0,
+    dice_berries: 0,
+    dice_lemons: 0,
+    dice_axes: 0,
+  }
 
-    const counter = (u) => {
-      u.dice_counts += 1
-      u.user_balance -= 10
-      switch (ctx.message.dice.value) {
-        case 1:
-          u.dice_alko += 1
-          u.user_balance += 100
-          return
-        case 22:
-          u.dice_berries += 1
-          u.user_balance += 100
-          return
-        case 43:
-          u.dice_lemons += 1
-          u.user_balance += 100
-          return
-        case 64:
-          u.dice_axes += 1
-          u.user_balance += 1000
-          return
-      }
-    }
-
-    // первый запуск, статы нет
-    if (user_stat.length == 0) {
-      user.user_id = ctx.message.from.id
-      counter(user)
-      user_stat.push(user)
-      return
-    }
-
-    // поиск пользователя по "бд"
-    for (let stat of user_stat) {
-      if (stat.user_id == ctx.message.from.id) {
-        counter(stat)
+  const counter = (u) => {
+    u.dice_counts += 1
+    u.user_balance -= 10
+    switch (ctx.message.dice.value) {
+      case 1:
+        u.dice_alko += 1
+        u.user_balance += 100
         return
-      }
+      case 22:
+        u.dice_berries += 1
+        u.user_balance += 100
+        return
+      case 43:
+        u.dice_lemons += 1
+        u.user_balance += 100
+        return
+      case 64:
+        u.dice_axes += 1
+        u.user_balance += 1000
+        return
     }
+  }
 
-    // пользователя нет в "бд"
+  // первый запуск, статы нет
+  if (user_stat.length == 0) {
     user.user_id = ctx.message.from.id
     counter(user)
     user_stat.push(user)
     return
-  } finally {
-    console.log(`-- -- --`)
   }
+
+  // поиск пользователя по "бд"
+  for (let stat of user_stat) {
+    if (stat.user_id == ctx.message.from.id) {
+      counter(stat)
+      return
+    }
+  }
+
+  // пользователя нет в "бд"
+  user.user_id = ctx.message.from.id
+  counter(user)
+  user_stat.push(user)
+  return
 })
 
 smb.command('/my_dices', (ctx) => {
