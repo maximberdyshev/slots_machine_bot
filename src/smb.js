@@ -30,7 +30,7 @@ smb.on('dice', async (ctx) => {
     date: new Date().getTime(),
   }
 
-  if (slotLimit.length >= 15) {
+  if (slotLimit.length >= 7) {
     ctx.deleteMessage(slotLimit[0].message_id)
     slotLimit.shift()
     slotLimit.push(oneSlot)

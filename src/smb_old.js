@@ -6,6 +6,7 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
 let user_stat = []
+
 smb.on('dice', async (ctx) => {
   if (ctx.chat.id != process.env.CHAT_ID) return
 
