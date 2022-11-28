@@ -8,26 +8,48 @@ const smb = new Telegraf(process.env.BOT_TOKEN)
 
 let user_stat = []
 
-smb.on('dice', async (ctx) => {
+smb.use(async (ctx, next) => {
   if (ctx.chat.id != process.env.CHAT_ID) return
+  await next()
+})
 
-  let dice = {
+smb.on('dice', async (ctx) => {
+  const foo = async (obj) => {
+    if (GameState.diceLimit.length >= 7) {
+      try {
+        await ctx.deleteMessage(GameState.diceLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.diceLimit.shift()
+      GameState.diceLimit.push(obj)
+    } else {
+      GameState.diceLimit.push(obj)
+    }
+  }
+
+  const dice = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
     date: ctx.message.date,
   }
 
-  if (GameState.diceLimit.length >= 3) {
-    ctx.deleteMessage(GameState.diceLimit[0].message_id)
-    GameState.diceLimit.shift()
-    GameState.diceLimit.push(dice)
-  } else {
-    GameState.diceLimit.push(dice)
-  }
+  foo(dice)
 
   // античит :D
   if (ctx.message.forward_date) {
-    ctx.reply('Читы - бан!')
+    const replyMSG = await ctx.reply('Читы - бан!')
+    const msg = {
+      message_id: replyMSG.message_id,
+      user_id: replyMSG.from.id,
+      date: replyMSG.date,
+    }
+
+    foo(msg)
+
+    // читы - на выход!
     return
   }
 
@@ -87,8 +109,30 @@ smb.on('dice', async (ctx) => {
   return
 })
 
-smb.command('/my_dices', (ctx) => {
-  if (ctx.chat.id != process.env.CHAT_ID) return
+smb.command('/my_dices', async (ctx) => {
+  const foo = async (obj) => {
+    if (GameState.myDiceLimit.length >= 4) {
+      try {
+        await ctx.deleteMessage(GameState.myDiceLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.myDiceLimit.shift()
+      GameState.myDiceLimit.push(obj)
+    } else {
+      GameState.myDiceLimit.push(obj)
+    }
+  }
+
+  const res = {
+    message_id: ctx.message.message_id,
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
+  }
+
+  foo(res)
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -131,7 +175,7 @@ smb.command('/my_dices', (ctx) => {
     }
   }
 
-  ctx.sendMessage(`${response.user_name}, твоя стата:
+  const replyMSG = await ctx.sendMessage(`${response.user_name}, твоя стата:
     бросков:  ${response.dice_counts}
     бар:  ${response.dice_alko},  (${chance.alko}%)
     ягодки:  ${response.dice_berries},  (${chance.berries}%)
@@ -139,6 +183,16 @@ smb.command('/my_dices', (ctx) => {
     топоры:  ${response.dice_axes},  (${chance.axes}%)
     баланc:  ${response.user_balance}
     net worth:  ${response.networth}`)
+
+  const msg = {
+    message_id: replyMSG.message_id,
+    user_id: replyMSG.from.id,
+    date: replyMSG.date,
+  }
+
+  foo(msg)
+
+  return
 })
 
 smb.launch()
