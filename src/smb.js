@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import GameState from './GameState.js'
 import { Telegraf } from 'telegraf'
 import DBC from './DBC.js'
 
@@ -6,43 +7,52 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
-// let usersAknowledge = []
-let slotLimit = []
-
-// const clear = () => {
-//   usersAknowledge.shift()
-// }
-
-smb.on('dice', async (ctx) => {
-  // ограничение на доступ
+// ограничение на доступ
+smb.use(async (ctx, next) => {
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
+  await next()
+})
 
-  // ограничитель на кол-во дайсов
-  // if (usersAknowledge.includes(ctx.message.from.id)) {
-  // ctx.deleteMessage(ctx.message.message_id)
-  // } else {
-  // usersAknowledge.push(ctx.message.from.id)
-  // setTimeout(clear, 3000)
+smb.on('dice', async (ctx) => {
+  const cleaner = async (obj) => {
+    if (GameState.diceLimit.length >= 7) {
+      try {
+        await ctx.deleteMessage(GameState.diceLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.diceLimit.shift()
+      GameState.diceLimit.push(obj)
+    } else {
+      GameState.diceLimit.push(obj)
+    }
+  }
 
-  let oneSlot = {
+  const dice = {
     message_id: ctx.message.message_id,
-    date: new Date().getTime(),
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
   }
 
-  if (slotLimit.length >= 7) {
-    ctx.deleteMessage(slotLimit[0].message_id)
-    slotLimit.shift()
-    slotLimit.push(oneSlot)
-  } else {
-    slotLimit.push(oneSlot)
-  }
+  cleaner(dice)
 
   // античит :D
   // (не работает против юзербота!)
   // TODO: возможно ограничить? )
   if (ctx.message.forward_date) {
-    ctx.reply('Читы - бан!')
+    const replyMSG = await ctx.reply('Читы - бан!')
+    const msg = {
+      message_id: replyMSG.message_id,
+      user_id: replyMSG.from.id,
+      date: replyMSG.date,
+    }
+
+    cleaner(msg)
+
+    // читы - на выход!
     return
   }
 
@@ -110,7 +120,6 @@ smb.on('dice', async (ctx) => {
     // если пользователь есть, то просто внести бросок в БД
     if (checkUser) {
       await DBC.setThrow(diceThrow)
-      // ctx.deleteMessage(ctx.message.message_id)
       return
     }
 
@@ -125,16 +134,34 @@ smb.on('dice', async (ctx) => {
 
     // и внести бросок в БД
     await DBC.setThrow(diceThrow)
-    // ctx.deleteMessage(ctx.message.message_id)
     return
   }
-  // }
 })
 
 smb.command('my_dices', async (ctx) => {
-  // ограничение на доступ
-  const checkAccess = await DBC.getAcces(ctx.chat.id)
-  if (!checkAccess) return
+  const cleaner = async (obj) => {
+    if (GameState.myDiceLimit.length >= 30) {
+      try {
+        await ctx.deleteMessage(GameState.myDiceLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.myDiceLimit.shift()
+      GameState.myDiceLimit.push(obj)
+    } else {
+      GameState.myDiceLimit.push(obj)
+    }
+  }
+
+  const res = {
+    message_id: ctx.message.message_id,
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
+  }
+
+  cleaner(res)
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -158,6 +185,7 @@ smb.command('my_dices', async (ctx) => {
   // если по пользователю уже есть стата
   const checkUser = await DBC.getUser(ctx.message.from.id)
   if (checkUser) {
+    // TODO: сделать 1-м запросом в БД
     response.dice_counts = await DBC.getMyDices(ctx.message.from.id, null)
     response.dice_alko = await DBC.getMyDices(ctx.message.from.id, 'alko')
     response.dice_berries = await DBC.getMyDices(ctx.message.from.id, 'berries')
@@ -191,14 +219,44 @@ smb.command('my_dices', async (ctx) => {
   }
 
   // если пользователь новый, то выводим сообщение
-  ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
+  const sendMSG = await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
 Ждёшь особого приглашения? Крути слоты!!!`)
+
+  const msg = {
+    message_id: sendMSG.message_id,
+    user_id: sendMSG.from.id,
+    date: sendMSG.date,
+  }
+
+  cleaner(msg)
+
+  return
 })
 
 smb.command('all_stats', async (ctx) => {
-  // ограничение на доступ
-  const checkAccess = await DBC.getAcces(ctx.chat.id)
-  if (!checkAccess) return
+  const cleaner = async (obj) => {
+    if (GameState.allStatsLimit.length >= 4) {
+      try {
+        await ctx.deleteMessage(GameState.allStatsLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.allStatsLimit.shift()
+      GameState.allStatsLimit.push(obj)
+    } else {
+      GameState.allStatsLimit.push(obj)
+    }
+  }
+
+  const res = {
+    message_id: ctx.message.message_id,
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
+  }
+
+  cleaner(res)
 
   const allBalance = await DBC.getAllBalance()
 
@@ -211,18 +269,60 @@ smb.command('all_stats', async (ctx) => {
     userStats.push(user)
   }
 
-  ctx.sendMessage(userStats.toString().replaceAll(',', '\n'))
+  const sendMSG = await ctx.sendMessage(
+    userStats.toString().replaceAll(',', '\n')
+  )
+
+  const msg = {
+    message_id: sendMSG.message_id,
+    user_id: sendMSG.from.id,
+    date: sendMSG.date,
+  }
+
+  cleaner(msg)
+
+  return
 })
 
 smb.command('mvp', async (ctx) => {
-  // ограничение на доступ
-  const checkAccess = await DBC.getAcces(ctx.chat.id)
-  if (!checkAccess) return
+  const cleaner = async (obj) => {
+    if (GameState.mvpLimit.length >= 4) {
+      try {
+        await ctx.deleteMessage(GameState.mvpLimit[0].message_id)
+      } catch (err) {
+        console.log(
+          `code: ${err.response.error_code}, desc: ${err.response.description}`
+        )
+      }
+      GameState.mvpLimit.shift()
+      GameState.mvpLimit.push(obj)
+    } else {
+      GameState.mvpLimit.push(obj)
+    }
+  }
+
+  const res = {
+    message_id: ctx.message.message_id,
+    user_id: ctx.message.from.id,
+    date: ctx.message.date,
+  }
+
+  cleaner(res)
 
   const mvp = await DBC.getMVP()
-  ctx.sendMessage(`MVP дня:
+  const sendMSG = await ctx.sendMessage(`MVP дня:
 Игрок ${mvp[0].first_name}!!! С ценностью в ${mvp[0].net_worth} очков!!
 Что за лев этот тигр!!`)
+
+  const msg = {
+    message_id: sendMSG.message_id,
+    user_id: sendMSG.from.id,
+    date: sendMSG.date,
+  }
+
+  cleaner(msg)
+
+  return
 })
 
 smb.launch()
