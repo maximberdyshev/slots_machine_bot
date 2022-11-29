@@ -37,7 +37,7 @@ smb.on('dice', async (ctx) => {
     date: ctx.message.date,
   }
 
-  cleaner(dice)
+  await cleaner(dice)
 
   // античит :D
   // (не работает против юзербота!)
@@ -50,7 +50,7 @@ smb.on('dice', async (ctx) => {
       date: replyMSG.date,
     }
 
-    cleaner(msg)
+    await cleaner(msg)
 
     // читы - на выход!
     return
@@ -161,7 +161,7 @@ smb.command('my_dices', async (ctx) => {
     date: ctx.message.date,
   }
 
-  cleaner(res)
+  await cleaner(res)
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -219,7 +219,8 @@ smb.command('my_dices', async (ctx) => {
   }
 
   // если пользователь новый, то выводим сообщение
-  const sendMSG = await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
+  const sendMSG =
+    await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
 Ждёшь особого приглашения? Крути слоты!!!`)
 
   const msg = {
@@ -228,7 +229,7 @@ smb.command('my_dices', async (ctx) => {
     date: sendMSG.date,
   }
 
-  cleaner(msg)
+  await cleaner(msg)
 
   return
 })
@@ -256,7 +257,7 @@ smb.command('all_stats', async (ctx) => {
     date: ctx.message.date,
   }
 
-  cleaner(res)
+  await cleaner(res)
 
   const allBalance = await DBC.getAllBalance()
 
@@ -279,7 +280,7 @@ smb.command('all_stats', async (ctx) => {
     date: sendMSG.date,
   }
 
-  cleaner(msg)
+  await cleaner(msg)
 
   return
 })
@@ -307,7 +308,7 @@ smb.command('mvp', async (ctx) => {
     date: ctx.message.date,
   }
 
-  cleaner(res)
+  await cleaner(res)
 
   const mvp = await DBC.getMVP()
   const sendMSG = await ctx.sendMessage(`MVP дня:
@@ -320,7 +321,7 @@ smb.command('mvp', async (ctx) => {
     date: sendMSG.date,
   }
 
-  cleaner(msg)
+  await cleaner(msg)
 
   return
 })
