@@ -24,7 +24,7 @@ smb.on('dice', async (ctx) => {
     date: ctx.message.date,
   }
 
-  GameState.cleanDice(dice, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanDice(dice, ctx.deleteMessage.bind(ctx))
 
   // античит :D
   // (не работает против юзербота!)
