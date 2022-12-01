@@ -54,14 +54,6 @@ smb.on('dice', async (ctx) => {
     }
   }
 
-  // первый запуск, статы нет
-  if (user_stat.length == 0) {
-    user.user_id = ctx.message.from.id
-    counter(user)
-    user_stat.push(user)
-    return
-  }
-
   // поиск пользователя по "бд"
   for (let stat of user_stat) {
     if (stat.user_id == ctx.message.from.id) {
@@ -70,11 +62,13 @@ smb.on('dice', async (ctx) => {
     }
   }
 
-  // пользователя нет в "бд"
-  user.user_id = ctx.message.from.id
-  counter(user)
-  user_stat.push(user)
-  return
+  // первый запуск, статы нет
+  if (user_stat.length == 0) {
+    user.user_id = ctx.message.from.id
+    counter(user)
+    user_stat.push(user)
+    return
+  }
 })
 
 smb.command('/my_dices', (ctx) => {
@@ -122,13 +116,13 @@ smb.command('/my_dices', (ctx) => {
   }
 
   ctx.sendMessage(`${response.user_name}, твоя стата:
-    бросков:  ${response.dice_counts}
-    бар:  ${response.dice_alko},  (${chance.alko}%)
-    ягодки:  ${response.dice_berries},  (${chance.berries}%)
-    лимоны:  ${response.dice_lemons},  (${chance.lemons}%)
-    топоры:  ${response.dice_axes},  (${chance.axes}%)
-    баланc:  ${response.user_balance}
-    net worth:  ${response.networth}`)
+     бросков:  ${response.dice_counts}
+     бар:  ${response.dice_alko},  (${chance.alko}%)
+     ягодки:  ${response.dice_berries},  (${chance.berries}%)
+     лимоны:  ${response.dice_lemons},  (${chance.lemons}%)
+     топоры:  ${response.dice_axes},  (${chance.axes}%)
+     баланc:  ${response.user_balance}
+     net worth:  ${response.networth}`)
 })
 
 smb.launch()
