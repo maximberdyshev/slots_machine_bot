@@ -1,3 +1,7 @@
+/**
+ * тестовый бот
+ */
+
 import dotenv from 'dotenv'
 import GameState from './GameState.js'
 import { Telegraf } from 'telegraf'
@@ -6,37 +10,22 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
+// иммитация БД с данными о бросках
 let user_stat = []
 
-smb.use(async (ctx, next) => {
+smb.use((ctx, next) => {
   if (ctx.chat.id != process.env.CHAT_ID) return
-  await next()
+  next()
 })
 
 smb.on('dice', async (ctx) => {
-  const foo = async (obj) => {
-    if (GameState.diceLimit.length >= 7) {
-      try {
-        await ctx.deleteMessage(GameState.diceLimit[0].message_id)
-      } catch (err) {
-        console.log(
-          `code: ${err.response.error_code}, desc: ${err.response.description}`
-        )
-      }
-      GameState.diceLimit.shift()
-      GameState.diceLimit.push(obj)
-    } else {
-      GameState.diceLimit.push(obj)
-    }
-  }
-
   const dice = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
     date: ctx.message.date,
   }
 
-  foo(dice)
+  GameState.cleanDice(dice, ctx.deleteMessage.bind(ctx))
 
   // античит :D
   if (ctx.message.forward_date) {
@@ -47,7 +36,7 @@ smb.on('dice', async (ctx) => {
       date: replyMSG.date,
     }
 
-    foo(msg)
+    GameState.cleanDice(msg, ctx.deleteMessage.bind(ctx))
 
     // читы - на выход!
     return
@@ -110,29 +99,13 @@ smb.on('dice', async (ctx) => {
 })
 
 smb.command('/my_dices', async (ctx) => {
-  const foo = async (obj) => {
-    if (GameState.myDiceLimit.length >= 4) {
-      try {
-        await ctx.deleteMessage(GameState.myDiceLimit[0].message_id)
-      } catch (err) {
-        console.log(
-          `code: ${err.response.error_code}, desc: ${err.response.description}`
-        )
-      }
-      GameState.myDiceLimit.shift()
-      GameState.myDiceLimit.push(obj)
-    } else {
-      GameState.myDiceLimit.push(obj)
-    }
-  }
-
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
     date: ctx.message.date,
   }
 
-  foo(res)
+  GameState.cleanMyDice(res, ctx.deleteMessage.bind(ctx))
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -190,7 +163,7 @@ smb.command('/my_dices', async (ctx) => {
     date: replyMSG.date,
   }
 
-  foo(msg)
+  GameState.cleanMyDice(msg, ctx.deleteMessage.bind(ctx))
 
   return
 })

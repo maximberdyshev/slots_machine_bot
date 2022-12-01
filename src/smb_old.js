@@ -1,3 +1,7 @@
+/**
+ * первый вариант бота, просто набросок
+ */
+
 import dotenv from 'dotenv'
 import { Telegraf } from 'telegraf'
 
@@ -5,6 +9,7 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
+// иммитация БД с данными о бросках
 let user_stat = []
 
 smb.on('dice', async (ctx) => {
