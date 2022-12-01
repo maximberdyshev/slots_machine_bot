@@ -14,7 +14,7 @@ smb.use(async (ctx, next) => {
   // а не по каждому броску стучать в базу
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
-  next()
+  await next()
 })
 
 smb.on('dice', async (ctx) => {
@@ -85,7 +85,7 @@ smb.command('my_dices', async (ctx) => {
     date: ctx.message.date,
   }
 
-  GameState.cleanMyDice(res, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanMyDice(res, ctx.deleteMessage.bind(ctx))
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -154,7 +154,7 @@ smb.command('my_dices', async (ctx) => {
     date: sendMSG.date,
   }
 
-  GameState.cleanMyDice(msg, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanMyDice(msg, ctx.deleteMessage.bind(ctx))
 
   return
 })
@@ -166,7 +166,7 @@ smb.command('all_stats', async (ctx) => {
     date: ctx.message.date,
   }
 
-  GameState.cleanAllStatsLimit(res, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanAllStatsLimit(res, ctx.deleteMessage.bind(ctx))
 
   const allBalance = await DBC.getAllBalance()
 
@@ -189,7 +189,7 @@ smb.command('all_stats', async (ctx) => {
     date: sendMSG.date,
   }
 
-  GameState.cleanAllStatsLimit(msg, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanAllStatsLimit(msg, ctx.deleteMessage.bind(ctx))
 
   return
 })
@@ -200,7 +200,7 @@ smb.command('mvp', async (ctx) => {  const res = {
     date: ctx.message.date,
   }
 
-  GameState.cleanMVPLimit(res, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanMVPLimit(res, ctx.deleteMessage.bind(ctx))
 
   const mvp = await DBC.getMVP()
   const sendMSG = await ctx.sendMessage(`MVP дня:
@@ -213,7 +213,7 @@ smb.command('mvp', async (ctx) => {  const res = {
     date: sendMSG.date,
   }
 
-  GameState.cleanMVPLimit(msg, ctx.deleteMessage.bind(ctx))
+  await GameState.cleanMVPLimit(msg, ctx.deleteMessage.bind(ctx))
 
   return
 })
