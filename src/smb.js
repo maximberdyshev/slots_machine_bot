@@ -37,7 +37,7 @@ smb.on('dice', async (ctx) => {
       date: replyMSG.date,
     }
 
-    GameState.cleanDice(msg, ctx.deleteMessage.bind(ctx))
+    await GameState.cleanDice(msg, ctx.deleteMessage.bind(ctx))
 
     // читы - на выход!
     return
@@ -144,7 +144,8 @@ smb.command('my_dices', async (ctx) => {
   }
 
   // если пользователь новый, то выводим сообщение
-  sendMSG = await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
+  sendMSG =
+    await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
 Ждёшь особого приглашения? Крути слоты!!!`)
 
   const msg = {

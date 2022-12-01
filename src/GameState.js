@@ -45,7 +45,7 @@ class GameState {
       } catch (err) { 
         console.log(`code: ${err.response.error_code}, desc: ${err.response.description}`) 
       }
-      GameState.diceLimit.shift()
+      await GameState.diceLimit.shift()
       GameState.diceLimit.push(obj)
     } else {
       GameState.diceLimit.push(obj)
