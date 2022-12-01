@@ -1,3 +1,4 @@
+// в процессе..
 // import DBC from "./DBC.js"
 
 class GameState {
@@ -11,8 +12,11 @@ class GameState {
   static allowedChats = []
 
   // обновляем список авторизованных чатов
+  // в процессе..
   // static updateAllowedChats = async () => {}
 
+  // поскольку к классу нет обращений извне,
+  // то и доступы тоже не нужны
   // /**
   //  * @param {any[]} arr
   //  */
@@ -39,14 +43,19 @@ class GameState {
 
   // автоудаление дайсов после достижения лимита
   static cleanDice = async (obj, func) => {
-    if (GameState.diceLimit.length >= 7) {
+    if (GameState.diceLimit.length >= 3) {
       try { 
         await func(GameState.diceLimit[0].message_id) 
-      } catch (err) { 
-        console.log(`code: ${err.response.error_code}, desc: ${err.response.description}`) 
+      } catch (err) {
+        console.log(err) 
+        // console.log(`code: ${err.response.error_code}, desc: ${err.response.description}`) 
       }
-      await GameState.diceLimit.shift()
+      console.log('удаляем дайс')
+      GameState.diceLimit.shift()
+      console.log(GameState.diceLimit)
+      console.log('добавляем дайс')
       GameState.diceLimit.push(obj)
+      console.log(GameState.diceLimit)
     } else {
       GameState.diceLimit.push(obj)
     }
