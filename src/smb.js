@@ -194,8 +194,7 @@ smb.command('all_stats', async (ctx) => {
   return
 })
 
-smb.command('mvp', async (ctx) => {
-  const res = {
+smb.command('mvp', async (ctx) => {  const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
     date: ctx.message.date,
