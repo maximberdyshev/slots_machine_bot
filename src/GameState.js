@@ -13,29 +13,29 @@ class GameState {
   // обновляем список авторизованных чатов
   // static updateAllowedChats = async () => {}
 
-  /**
-   * @param {any[]} arr
-   */
-  set myDiceLimit(arr) { GameState.myDiceLimit = arr }
-  get myDiceLimit() { return GameState.myDiceLimit }
+  // /**
+  //  * @param {any[]} arr
+  //  */
+  // set myDiceLimit(arr) { GameState.myDiceLimit = arr }
+  // get myDiceLimit() { return GameState.myDiceLimit }
 
-  /**
-   * @param {any[]} arr
-   */
-  set diceLimit(arr) { GameState.diceLimit = arr }
-  get diceLimit() { return GameState.diceLimit }
+  // /**
+  //  * @param {any[]} arr
+  //  */
+  // set diceLimit(arr) { GameState.diceLimit = arr }
+  // get diceLimit() { return GameState.diceLimit }
 
-  /**
-   * @param {any[]} arr
-   */
-  set allStatsLimit(arr) { GameState.allStatsLimit = arr }
-  get allStatsLimit() { return GameState.allStatsLimit }
+  // /**
+  //  * @param {any[]} arr
+  //  */
+  // set allStatsLimit(arr) { GameState.allStatsLimit = arr }
+  // get allStatsLimit() { return GameState.allStatsLimit }
 
-  /**
-   * @param {any[]} arr
-   */
-  set mvpLimit(arr) { GameState.mvpLimit = arr }
-  get mvpLimit() { return GameState.mvpLimit }
+  // /**
+  //  * @param {any[]} arr
+  //  */
+  // set mvpLimit(arr) { GameState.mvpLimit = arr }
+  // get mvpLimit() { return GameState.mvpLimit }
 
   // автоудаление дайсов после достижения лимита
   static cleanDice = async (obj, func) => {
@@ -50,6 +50,7 @@ class GameState {
     } else {
       GameState.diceLimit.push(obj)
     }
+    return
   }
 
   // автоудаление сообщений бота о стате игрока
@@ -66,6 +67,7 @@ class GameState {
     } else {
       GameState.myDiceLimit.push(obj)
     }
+    return
   }
 
   // автоудаление сообщений бота с таблицой стат
@@ -81,6 +83,7 @@ class GameState {
     } else {
       GameState.allStatsLimit.push(obj)
     }
+    return
   }
 
   // автоудаление сообщений бота о MVP игроке
@@ -96,6 +99,7 @@ class GameState {
     } else {
       GameState.mvpLimit.push(obj)
     }
+    return
   }
 }
 

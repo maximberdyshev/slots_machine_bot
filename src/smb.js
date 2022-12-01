@@ -14,7 +14,7 @@ smb.use(async (ctx, next) => {
   // а не по каждому броску стучать в базу
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
-  next()
+  await next()
 })
 
 smb.on('dice', async (ctx) => {
