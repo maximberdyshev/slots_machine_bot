@@ -8,16 +8,22 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
 // ограничение на доступ
-smb.use(async (ctx, next) => {
+// smb.use(async (ctx, next) => {
+//   // TODO: данные о доступе можно вынести в память бота
+//   // и запрашивать обновление раз в несколько минут
+//   // а не по каждому броску стучать в базу
+//   const checkAccess = await DBC.getAcces(ctx.chat.id)
+//   if (!checkAccess) return
+//   next()
+// })
+
+smb.on('dice', async (ctx) => {
   // TODO: данные о доступе можно вынести в память бота
   // и запрашивать обновление раз в несколько минут
   // а не по каждому броску стучать в базу
   const checkAccess = await DBC.getAcces(ctx.chat.id)
   if (!checkAccess) return
-  next()
-})
 
-smb.on('dice', async (ctx) => {
   const dice = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -79,6 +85,12 @@ smb.on('dice', async (ctx) => {
 })
 
 smb.command('my_dices', async (ctx) => {
+  // TODO: данные о доступе можно вынести в память бота
+  // и запрашивать обновление раз в несколько минут
+  // а не по каждому броску стучать в базу
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -144,7 +156,8 @@ smb.command('my_dices', async (ctx) => {
   }
 
   // если пользователь новый, то выводим сообщение
-  sendMSG = await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
+  sendMSG =
+    await ctx.sendMessage(`${ctx.message.from.first_name}, сорян, но по тебе нет статы.. 
 Ждёшь особого приглашения? Крути слоты!!!`)
 
   const msg = {
@@ -159,6 +172,12 @@ smb.command('my_dices', async (ctx) => {
 })
 
 smb.command('all_stats', async (ctx) => {
+  // TODO: данные о доступе можно вынести в память бота
+  // и запрашивать обновление раз в несколько минут
+  // а не по каждому броску стучать в базу
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -194,6 +213,12 @@ smb.command('all_stats', async (ctx) => {
 })
 
 smb.command('mvp', async (ctx) => {
+  // TODO: данные о доступе можно вынести в память бота
+  // и запрашивать обновление раз в несколько минут
+  // а не по каждому броску стучать в базу
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
