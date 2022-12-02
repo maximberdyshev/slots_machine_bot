@@ -50,12 +50,8 @@ class GameState {
         console.log(err) 
         // console.log(`code: ${err.response.error_code}, desc: ${err.response.description}`) 
       }
-      console.log('удаляем дайс')
       GameState.diceLimit.shift()
-      console.log(GameState.diceLimit)
-      console.log('добавляем дайс')
       GameState.diceLimit.push(obj)
-      console.log(GameState.diceLimit)
     } else {
       GameState.diceLimit.push(obj)
     }
