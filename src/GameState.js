@@ -43,7 +43,7 @@ class GameState {
 
   // автоудаление дайсов после достижения лимита
   static cleanDice = async (obj, func) => {
-    if (GameState.diceLimit.length >= 3) {
+    if (GameState.diceLimit.length >= 7) {
       try { 
         await func(GameState.diceLimit[0].message_id) 
       } catch (err) {
@@ -77,7 +77,7 @@ class GameState {
 
   // автоудаление сообщений бота с таблицой стат
   static cleanAllStatsLimit = async (obj, func) => {
-    if (GameState.allStatsLimit.length >= 2) {
+    if (GameState.allStatsLimit.length >= 4) {
       try {
         await func(GameState.allStatsLimit[0].message_id)
       } catch (err) {
@@ -93,7 +93,7 @@ class GameState {
 
   // автоудаление сообщений бота о MVP игроке
   static cleanMVPLimit = async (obj, func) => {
-    if (GameState.mvpLimit.length >= 2) {
+    if (GameState.mvpLimit.length >= 4) {
       try {
         await func(GameState.mvpLimit[0].message_id)
       } catch (err) {
