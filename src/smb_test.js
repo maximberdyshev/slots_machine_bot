@@ -4,6 +4,7 @@
 
 import dotenv from 'dotenv'
 import GameState from './GameState.js'
+import GameState_test from './GameState_test.js'
 import { Telegraf } from 'telegraf'
 
 dotenv.config({ path: '~/Prog/smb/.env' })
@@ -64,7 +65,8 @@ smb.on('dice', async (ctx) => {
   }
 
   // TODO: вынести логику удаления на сторону внешнего класса, возможно?
-  await GameState.cleanDice(dice, ctx.deleteMessage.bind(ctx))
+  // await GameState.cleanDice(dice, ctx.deleteMessage.bind(ctx))
+  GameState_test.addDice(dice, ctx)
 
   let user = {
     user_id: null,
@@ -100,7 +102,7 @@ smb.command('/my_dices', async (ctx) => {
     date: ctx.message.date,
   }
 
-  GameState.cleanMyDice(res, ctx.deleteMessage.bind(ctx))
+  // GameState.cleanMyDice(res, ctx.deleteMessage.bind(ctx))
 
   let response = {
     user_name: ctx.message.from.first_name,
@@ -158,7 +160,7 @@ smb.command('/my_dices', async (ctx) => {
     date: replyMSG.date,
   }
 
-  GameState.cleanMyDice(msg, ctx.deleteMessage.bind(ctx))
+  // GameState.cleanMyDice(msg, ctx.deleteMessage.bind(ctx))
 
   return
 })
