@@ -8,16 +8,23 @@ dotenv.config({ path: '~/Prog/smb/.env' })
 const smb = new Telegraf(process.env.BOT_TOKEN)
 
 // ограничение на доступ
-smb.use(async (ctx, next) => {
-  // TODO: данные о доступе можно вынести в память бота
-  // и запрашивать обновление раз в несколько минут
-  // а не по каждому броску стучать в базу
-  const checkAccess = await DBC.getAcces(ctx.chat.id)
-  if (!checkAccess) return
-  await next()
-})
+// ТЕОРИЯ! бот реагирует на опросы
+// т.к. бот имеет доступ ко всем сообщениям, но функционал реализован
+// лишь на дайсах, то реагирование промежуточного обработчика на все
+// сообщения - ни к чему
+// smb.use(async (ctx, next) => {
+//   // TODO: данные о доступе можно вынести в память бота
+//   // и запрашивать обновление раз в несколько минут
+//   // а не по каждому броску стучать в базу
+//   const checkAccess = await DBC.getAcces(ctx.chat.id)
+//   if (!checkAccess) return
+//   await next()
+// })
 
 smb.on('dice', async (ctx) => {
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const dice = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -79,6 +86,9 @@ smb.on('dice', async (ctx) => {
 })
 
 smb.command('my_dices', async (ctx) => {
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -160,6 +170,9 @@ smb.command('my_dices', async (ctx) => {
 })
 
 smb.command('all_stats', async (ctx) => {
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
   const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
@@ -194,7 +207,11 @@ smb.command('all_stats', async (ctx) => {
   return
 })
 
-smb.command('mvp', async (ctx) => {  const res = {
+smb.command('mvp', async (ctx) => {
+  const checkAccess = await DBC.getAcces(ctx.chat.id)
+  if (!checkAccess) return
+
+  const res = {
     message_id: ctx.message.message_id,
     user_id: ctx.message.from.id,
     date: ctx.message.date,
